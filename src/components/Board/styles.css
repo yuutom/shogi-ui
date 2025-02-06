@@ -1,0 +1,27 @@
+.shogi-container {
+    text-align: center;
+}
+
+.shogi-board {
+    display: grid;
+    grid-template-columns: repeat(9, 50px);
+    gap: 2px;
+    margin: 20px auto;
+    width: 450px;
+    border: 2px solid black;
+}
+
+.square {
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    cursor: pointer;
+}
+
+.square.selected {
+    background-color: lightblue;
+}
