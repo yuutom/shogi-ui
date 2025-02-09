@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Shogi } from "shogi.js";
 import axios from "axios";
-import Square from "./Square";
+import Square from "./Square.tsx";
 import "./styles.css";
 
 const ShogiBoard: React.FC = () => {
