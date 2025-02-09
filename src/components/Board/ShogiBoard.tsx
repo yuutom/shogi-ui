@@ -15,17 +15,33 @@ const ShogiBoard: React.FC = () => {
         if (!selectedPiece.from) {
             setSelectedPiece({ from: square, to: null });
         } else {
-            const move = `${selectedPiece.from}${square}`;
-            if (shogi.move(move)) {
-                setShogi(new Shogi(shogi.toSFEN()));
+            const fromX = parseInt(selectedPiece.from[0], 10);
+            const fromY = parseInt(selectedPiece.from[1], 10);
+            const toX = parseInt(square[0], 10);
+            const toY = parseInt(square[1], 10);
+    
+            const legalMoves = shogi.getMovesFrom(fromX, fromY);
+            // const isLegalMove = legalMoves.some(move => move.from === selectedPiece.from && move.to === square);
+    
+            if (true) {
+                shogi.move(fromX, fromY, toX, toY);
+                setShogi(new Shogi());
+                setShogi((prevShogi) => {
+                    prevShogi.initializeFromSFENString(shogi.toSFENString());  // ✅ `toSFENString()` を正しく使用
+                    return prevShogi;
+                });
                 setSelectedPiece({ from: null, to: null });
-
+    
                 axios
-                    .post("http://localhost:8000/move", { sfen: shogi.toSFEN() })
+                    .post("http://localhost:8000/move", { sfen: shogi.toSFENString() })  // ✅ SFENの取得方法を修正
                     .then((response) => {
                         const aiMove = response.data.move;
-                        shogi.move(aiMove);
-                        setShogi(new Shogi(shogi.toSFEN()));
+                        shogi.move(aiMove.from.x, aiMove.from.y, aiMove.to.x, aiMove.to.y);  // ✅ AIの指し手を適用
+                        setShogi(new Shogi());
+                        setShogi((prevShogi) => {
+                            prevShogi.initializeFromSFENString(shogi.toSFENString());
+                            return prevShogi;
+                        });
                     })
                     .catch((error) => console.error("AI Move Error:", error));
             }
@@ -36,9 +52,17 @@ const ShogiBoard: React.FC = () => {
         <div className="shogi-container">
             <h2>将棋AI対戦</h2>
             <div className="shogi-board">
-                {shogi.board().flat().map((piece, index) => {
+                {shogi.board.flat().map((piece, index) => {
                     const square = `${9 - Math.floor(index / 9)}${(index % 9) + 1}`;
-                    return <Square key={square} square={square} piece={piece} onClick={handleClick} isSelected={selectedPiece.from === square} />;
+                    return (
+                        <Square 
+                            key={square} 
+                            square={square} 
+                            piece={piece} 
+                            onClick={handleClick} 
+                            isSelected={selectedPiece.from === square} 
+                        />
+                    );
                 })}
             </div>
         </div>
